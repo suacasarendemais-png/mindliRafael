@@ -75,7 +75,7 @@ const AvaliacaoForm: React.FC = () => {
         };
         
         initialize();
-    }, [id, isEditMode, addToast]);
+    }, [id, isEditMode, addToast, availableExercises]);
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

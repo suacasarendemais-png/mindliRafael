@@ -1,7 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { User } from 'firebase/auth';
-import { auth, db } from '../lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
 import { Usuario } from '../types';
 
 interface AuthContextType {
@@ -13,33 +11,21 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [userProfile, setUserProfile] = useState<Usuario | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Mocked user and profile to bypass login for testing
+  const mockUser = { uid: 'mock-admin-uid', email: 'admin@test.com' } as User;
+  const mockAdminProfile: Usuario = {
+    id: 'mock-admin-uid',
+    name: 'Admin de Testes',
+    email: 'admin@test.com',
+    role: 'Admin'
+  };
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        // User is signed in, let's fetch their profile from Firestore
-        const userDocRef = doc(db, 'users', currentUser.uid);
-        const userDocSnap = await getDoc(userDocRef);
-        if (userDocSnap.exists()) {
-          setUserProfile({ id: userDocSnap.id, ...userDocSnap.data() } as Usuario);
-        } else {
-          // Handle case where user exists in Auth but not in Firestore
-          console.error("User profile not found in Firestore!");
-          setUserProfile(null);
-        }
-      } else {
-        // User is signed out
-        setUserProfile(null);
-      }
-      setLoading(false);
-    });
+  const [user, setUser] = useState<User | null>(mockUser);
+  const [userProfile, setUserProfile] = useState<Usuario | null>(mockAdminProfile);
+  const [loading, setLoading] = useState(false); // Start with loading false
 
-    return () => unsubscribe();
-  }, []);
+  // The original useEffect that listens to Firebase Auth state changes is removed.
+  // This effectively forces the app to always be in a "logged-in as Admin" state.
 
   return (
     <AuthContext.Provider value={{ user, userProfile, loading }}>

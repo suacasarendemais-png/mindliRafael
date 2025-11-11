@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
 import { SearchIcon, PaperClipIcon, CheckIcon } from '../components/Icons';
 
 const conversationsData = [
@@ -24,7 +23,6 @@ const messagesData: { [key: number]: any[] } = {
 
 
 const Mensagens: React.FC = () => {
-  const { } = useAuth();
   const [activeConversationId, setActiveConversationId] = useState<number | null>(1);
   const [message, setMessage] = useState('');
 
