@@ -44,7 +44,9 @@ const AppRoutes: React.FC = () => {
         return <DashboardAdmin />;
       case 'Aluno':
         return <DashboardAluno />;
-      // TODO: Add dashboards for Professor, etc.
+      case 'Professor':
+        // Por enquanto, professores e administradores compartilham o mesmo dashboard
+        return <DashboardAdmin />;
       default:
         // Fallback for other roles or if profile is not loaded yet
         return <div className="text-white">Dashboard em construção para o seu perfil.</div>;
