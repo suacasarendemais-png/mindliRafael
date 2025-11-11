@@ -141,8 +141,8 @@ const Turmas: React.FC = () => {
       const turmasData = querySnapshot.docs.map(doc => {
         const data = doc.data() as Turma;
         return {
-          ...data,
           id: doc.id,
+          ...data,
           students: data.studentIds?.length || 0
         }
       });

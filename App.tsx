@@ -5,7 +5,6 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ToastProvider } from './components/Toaster';
 
 import Layout from './components/Layout';
-import Login from './pages/Login';
 import DashboardAdmin from './pages/dashboards/DashboardAdmin';
 import DashboardAluno from './pages/dashboards/DashboardAluno';
 import Turmas from './pages/Turmas';
@@ -28,9 +27,7 @@ import RevisaoAvaliacao from './pages/RevisaoAvaliacao';
 
 
 const AppRoutes: React.FC = () => {
-  const { user, userProfile, loading } = useAuth();
-
-
+  const { userProfile, loading } = useAuth();
 
   if (loading) {
     return (
@@ -46,9 +43,7 @@ const AppRoutes: React.FC = () => {
         return <DashboardAdmin />;
       case 'Aluno':
         return <DashboardAluno />;
-      case 'Professor':
-        // Por enquanto, professores e administradores compartilham o mesmo dashboard
-        return <DashboardAdmin />;
+      // TODO: Add dashboards for Professor, etc.
       default:
         // Fallback for other roles or if profile is not loaded yet
         return <div className="text-white">Dashboard em construção para o seu perfil.</div>;
@@ -57,49 +52,40 @@ const AppRoutes: React.FC = () => {
 
   return (
     <div className="bg-gray-900 text-white min-h-screen">
-      {!user ? (
-        <div className="flex items-center justify-center min-h-screen">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="*" element={<Navigate to="/login" />} />
-          </Routes>
-        </div>
-      ) : (
-        <Layout>
-          <Routes>
-            <Route path="/" element={getDashboardByRole()} />
-            <Route path="/turmas" element={<Turmas />} />
-            <Route path="/turmas/:id" element={<TurmaDetalhes />} />
-            <Route path="/cursos" element={<Cursos />} />
-            <Route path="/cursos/:id" element={<CursoDetalhes />} />
-            <Route path="/usuarios" element={<Usuarios />} />
-            <Route path="/gamificacao" element={<Gamificacao />} />
-            <Route path="/mensagens" element={<Mensagens />} />
-            <Route path="/biblioteca" element={<Biblioteca />} />
-            <Route path="/configuracoes" element={<Configuracoes />} />
-            
-            {/* Rotas de Conteúdo (Admin/Professor) */}
-            <Route path="/exercicios/gerenciar" element={<ExerciciosGerenciar />} />
-            <Route path="/exercicio/novo" element={<ExercicioForm />} />
-            <Route path="/exercicio/editar/:id" element={<ExercicioForm />} />
-            <Route path="/avaliacoes/gerenciar" element={<AvaliacoesGerenciar />} />
-            <Route path="/avaliacao/nova" element={<AvaliacaoForm />} />
-            <Route path="/avaliacao/editar/:id" element={<AvaliacaoForm />} />
-            <Route path="/avaliacoes/resultados/:avaliacaoId" element={<AvaliacaoResultados />} />
+      <Layout>
+        <Routes>
+          <Route path="/" element={getDashboardByRole()} />
+          <Route path="/turmas" element={<Turmas />} />
+          <Route path="/turmas/:id" element={<TurmaDetalhes />} />
+          <Route path="/cursos" element={<Cursos />} />
+          <Route path="/cursos/:id" element={<CursoDetalhes />} />
+          <Route path="/usuarios" element={<Usuarios />} />
+          <Route path="/gamificacao" element={<Gamificacao />} />
+          <Route path="/mensagens" element={<Mensagens />} />
+          <Route path="/biblioteca" element={<Biblioteca />} />
+          <Route path="/configuracoes" element={<Configuracoes />} />
+          
+          {/* Rotas de Conteúdo (Admin/Professor) */}
+          <Route path="/exercicios/gerenciar" element={<ExerciciosGerenciar />} />
+          <Route path="/exercicio/novo" element={<ExercicioForm />} />
+          <Route path="/exercicio/editar/:id" element={<ExercicioForm />} />
+          <Route path="/avaliacoes/gerenciar" element={<AvaliacoesGerenciar />} />
+          <Route path="/avaliacao/nova" element={<AvaliacaoForm />} />
+          <Route path="/avaliacao/editar/:id" element={<AvaliacaoForm />} />
+          <Route path="/avaliacoes/resultados/:avaliacaoId" element={<AvaliacaoResultados />} />
 
 
-            {/* Rotas de Aluno */}
-            <Route path="/avaliacoes/aluno" element={<AlunoAvaliacaoList />} />
-            <Route path="/avaliacoes/realizar/:avaliacaoId" element={<RealizarAvaliacao />} />
+          {/* Rotas de Aluno */}
+          <Route path="/avaliacoes/aluno" element={<AlunoAvaliacaoList />} />
+          <Route path="/avaliacoes/realizar/:avaliacaoId" element={<RealizarAvaliacao />} />
 
-            {/* Rota Comum (Aluno e Professor/Admin) */}
-            <Route path="/avaliacoes/revisao/:resultadoId" element={<RevisaoAvaliacao />} />
+          {/* Rota Comum (Aluno e Professor/Admin) */}
+          <Route path="/avaliacoes/revisao/:resultadoId" element={<RevisaoAvaliacao />} />
 
 
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </Layout>
-      )}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Layout>
     </div>
   );
 };
