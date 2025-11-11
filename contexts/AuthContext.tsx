@@ -20,9 +20,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     role: 'Admin'
   };
 
-  const [user, setUser] = useState<User | null>(mockUser);
-  const [userProfile, setUserProfile] = useState<Usuario | null>(mockAdminProfile);
-  const [loading, setLoading] = useState(false); // Start with loading false
+  const [user] = useState<User | null>(mockUser);
+  const [userProfile] = useState<Usuario | null>(mockAdminProfile);
+  const [loading] = useState(false); // Start with loading false
 
   // The original useEffect that listens to Firebase Auth state changes is removed.
   // This effectively forces the app to always be in a "logged-in as Admin" state.
