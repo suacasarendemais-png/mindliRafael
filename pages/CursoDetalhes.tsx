@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { db } from '../lib/firebase';
-import { doc, getDoc, collection, getDocs, query, where, addDoc, serverTimestamp, orderBy, updateDoc, deleteDoc, writeBatch, getCountFromServer } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, query, where, addDoc, serverTimestamp, orderBy, updateDoc, deleteDoc } from 'firebase/firestore';
 import { Turma, Curso, Modulo, Licao } from '../types';
-import { ArrowLeftIcon, RectangleStackIcon, EyeIcon, PlusIcon, PencilIcon, TrashIcon, DocumentTextIcon, PlayCircleIcon } from '../components/Icons';
+import { ArrowLeftIcon, EyeIcon, PlusIcon, PencilIcon, TrashIcon, DocumentTextIcon, PlayCircleIcon } from '../components/Icons';
 import Modal from '../components/Modal';
 import { useToast } from '../components/Toaster';
 import ConfirmationModal from '../components/ConfirmationModal';

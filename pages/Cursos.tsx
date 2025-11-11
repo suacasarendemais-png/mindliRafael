@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { db } from '../lib/firebase';
 import { collection, addDoc, getDocs, query, where, orderBy, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { Curso, Turma } from '../types';
+import { Curso } from '../types';
 import { SearchIcon, ChevronDownIcon, EyeIcon, PencilIcon, TrashIcon } from '../components/Icons';
 import Modal from '../components/Modal';
 import ConfirmationModal from '../components/ConfirmationModal';

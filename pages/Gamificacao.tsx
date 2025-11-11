@@ -121,7 +121,7 @@ const Gamificacao: React.FC = () => {
                     </div>
                     <div className="flex items-center w-7/12">
                       <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center font-bold mr-4">
-                        {player.name.charAt(0)}
+                        {player.name?.charAt(0)}
                       </div>
                       <span className="font-semibold text-white">{player.name}</span>
                     </div>

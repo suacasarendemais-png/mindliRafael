@@ -24,7 +24,7 @@ const messagesData: { [key: number]: any[] } = {
 
 
 const Mensagens: React.FC = () => {
-  const { userProfile } = useAuth();
+  const { } = useAuth();
   const [activeConversationId, setActiveConversationId] = useState<number | null>(1);
   const [message, setMessage] = useState('');
 

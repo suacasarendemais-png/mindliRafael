@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
-import { collection, query, where, getDocs, documentId } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { Avaliacao, ResultadoAvaliacao } from '../types';
 import { ClipboardDocumentListIcon, CheckCircleIcon } from '../components/Icons';
 
