@@ -126,9 +126,9 @@ const Cursos: React.FC = () => {
       const querySnapshot = await getDocs(q);
       const cursosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Curso));
       setCursos(cursosData);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching cursos:", err);
-      setError("Não foi possível carregar os cursos. Missing or insufficient permissions.");
+      setError(`Não foi possível carregar os cursos: ${err.message}`);
     } finally {
       setLoading(false);
     }

@@ -122,9 +122,9 @@ const Usuarios: React.FC = () => {
       const querySnapshot = await getDocs(q);
       const usuariosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Usuario));
       setUsuarios(usuariosData);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching usuarios:", err);
-      setError("Não foi possível carregar os usuários. Missing or insufficient permissions.");
+      setError(`Não foi possível carregar os usuários: ${err.message}`);
     } finally {
       setLoading(false);
     }

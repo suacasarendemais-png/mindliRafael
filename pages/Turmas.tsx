@@ -14,7 +14,7 @@ const TurmaForm: React.FC<{
   turmaToEdit?: Turma | null;
 }> = ({ onClose, onSuccess, turmaToEdit }) => {
   const [name, setName] = useState('');
-  const [serie, setSerie] = useState('1º Ano EM');
+  const [serie, setSerie] = useState('6º Ano EF');
   const [turno, setTurno] = useState('Manhã');
   const [loading, setLoading] = useState(false);
   const { addToast } = useToast();
@@ -80,10 +80,27 @@ const TurmaForm: React.FC<{
           onChange={(e) => setSerie(e.target.value)}
           className="w-full appearance-none bg-gray-700/60 border border-gray-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
         >
-          <option>1º Ano EM</option>
-          <option>2º Ano EM</option>
-          <option>3º Ano EM</option>
-          <option>Curso Livre</option>
+          <optgroup label="Ensino Fundamental I">
+            <option>1º Ano EF</option>
+            <option>2º Ano EF</option>
+            <option>3º Ano EF</option>
+            <option>4º Ano EF</option>
+            <option>5º Ano EF</option>
+          </optgroup>
+          <optgroup label="Ensino Fundamental II">
+            <option>6º Ano EF</option>
+            <option>7º Ano EF</option>
+            <option>8º Ano EF</option>
+            <option>9º Ano EF</option>
+          </optgroup>
+          <optgroup label="Ensino Médio">
+            <option>1º Ano EM</option>
+            <option>2º Ano EM</option>
+            <option>3º Ano EM</option>
+          </optgroup>
+          <optgroup label="Outros">
+            <option>Curso Livre</option>
+          </optgroup>
         </select>
       </div>
       <div>
@@ -147,9 +164,9 @@ const Turmas: React.FC = () => {
         }
       });
       setTurmas(turmasData);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching turmas:", err);
-      setError("Não foi possível carregar as turmas. Missing or insufficient permissions.");
+      setError(`Não foi possível carregar as turmas: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -205,6 +222,7 @@ const Turmas: React.FC = () => {
 
   const getSerieColor = (serie: string) => {
      if (serie.includes('EM')) return 'bg-green-500/20 text-green-400 border-green-500/30';
+     if (serie.includes('EF')) return 'bg-purple-500/20 text-purple-400 border-purple-500/30';
      if (serie.includes('Livre')) return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30';
      return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
   }
@@ -308,10 +326,27 @@ const Turmas: React.FC = () => {
               className="w-full appearance-none bg-gray-700/60 border border-gray-600 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
             >
               <option>Todas as Séries</option>
-              <option>1º Ano EM</option>
-              <option>2º Ano EM</option>
-              <option>3º Ano EM</option>
-              <option>Curso Livre</option>
+              <optgroup label="Ensino Fundamental I">
+                <option>1º Ano EF</option>
+                <option>2º Ano EF</option>
+                <option>3º Ano EF</option>
+                <option>4º Ano EF</option>
+                <option>5º Ano EF</option>
+              </optgroup>
+              <optgroup label="Ensino Fundamental II">
+                <option>6º Ano EF</option>
+                <option>7º Ano EF</option>
+                <option>8º Ano EF</option>
+                <option>9º Ano EF</option>
+              </optgroup>
+              <optgroup label="Ensino Médio">
+                <option>1º Ano EM</option>
+                <option>2º Ano EM</option>
+                <option>3º Ano EM</option>
+              </optgroup>
+              <optgroup label="Outros">
+                <option>Curso Livre</option>
+              </optgroup>
             </select>
             <ChevronDownIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
           </div>

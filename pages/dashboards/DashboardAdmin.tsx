@@ -36,9 +36,9 @@ const DashboardAdmin: React.FC = () => {
           alunosAtivos: alunosAtivosSnap.data().count.toString(),
         });
 
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error fetching dashboard stats:", err);
-        setError("Não foi possível carregar as estatísticas.");
+        setError(`Não foi possível carregar as estatísticas: ${err.message}`);
       } finally {
         setLoading(false);
       }
