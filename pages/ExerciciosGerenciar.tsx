@@ -7,7 +7,6 @@ import { SearchIcon, ChevronDownIcon, EyeIcon, PencilIcon, TrashIcon, PlusIcon }
 import { useToast } from '../components/Toaster';
 import ConfirmationModal from '../components/ConfirmationModal';
 
-
 const ExerciciosGerenciar: React.FC = () => {
     const navigate = useNavigate();
     const { addToast } = useToast();
@@ -23,11 +22,11 @@ const ExerciciosGerenciar: React.FC = () => {
         try {
             const q = query(collection(db, 'exercicios'), orderBy('created_at', 'desc'));
             const querySnapshot = await getDocs(q);
-            const exerciciosList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Exercicio));
-            setExercicios(exerciciosList);
-        } catch (err: any) {
+            const exerciciosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Exercicio));
+            setExercicios(exerciciosData);
+        } catch (err) {
+            console.error("Error fetching exercicios:", err);
             setError("Não foi possível carregar os exercícios.");
-            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -47,9 +46,10 @@ const ExerciciosGerenciar: React.FC = () => {
         try {
             await deleteDoc(doc(db, 'exercicios', exercicioToDelete.id));
             addToast('Exercício excluído com sucesso!', 'success');
-            fetchExercicios();
-        } catch (error: any) {
-            addToast('Erro ao excluir exercício: ' + error.message, 'error');
+            fetchExercicios(); // Refresh
+        } catch (error) {
+            addToast("Erro ao excluir exercício.", 'error');
+            console.error("Error deleting exercicio:", error);
         } finally {
             setConfirmOpen(false);
             setExercicioToDelete(null);

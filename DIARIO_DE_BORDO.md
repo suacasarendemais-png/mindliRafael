@@ -4,6 +4,20 @@ Este documento registra o histórico de desenvolvimento da plataforma MINDLI, de
 
 ---
 
+### **Etapa 21: Estabilização do Ambiente de Produção e Conexão Real com Backend**
+
+**Objetivo:** Garantir a integridade do código para o build em produção, resolver inconsistências de dados causadas por regras de segurança e reativar a conexão completa com o backend do Firebase para operar com dados reais.
+
+**Implementações:**
+- **Correção de Erros de Build (TypeScript):** Foram resolvidos múltiplos erros de tipagem e variáveis não utilizadas que impediam o build bem-sucedido em ambientes de produção como a Vercel, garantindo um código mais limpo e robusto.
+- **Remoção de Dados de Demonstração (Mocks):** Todo o código que utilizava dados estáticos (mocks) para simular o comportamento das páginas (Dashboard, Turmas, Cursos, etc.) foi removido.
+- **Reativação das Chamadas ao Firebase:** As funcionalidades de leitura (getDocs, getDoc) e escrita (addDoc, updateDoc, deleteDoc) foram reestabelecidas em todos os componentes, conectando a interface diretamente ao banco de dados Firestore.
+- **Autenticação Real:** O sistema de login e verificação de perfil de usuário (`AuthContext`) foi reconectado ao Firebase Authentication, abandonando o usuário de teste simulado.
+
+**Resultado:** A plataforma saiu de um modo de desenvolvimento/visualização para um estado totalmente operacional. Todas as interações do usuário agora são persistidas em tempo real no banco de dados, refletindo o ambiente de produção real e finalizando a transição do protótipo para a aplicação funcional.
+
+---
+
 ### **Etapa 20: Ferramenta de Revisão Detalhada da Avaliação**
 
 **Objetivo:** Fechar o ciclo de feedback de aprendizagem, permitindo que alunos e professores analisem detalhadamente uma avaliação concluída para entender os erros e acertos.

@@ -31,36 +31,32 @@ const UsuarioForm: React.FC<{
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       if (usuarioToEdit) {
-        // Update user in Firestore
+        // Edit existing user in Firestore
         const userRef = doc(db, 'users', usuarioToEdit.id);
-        await updateDoc(userRef, {
-          name,
-          role,
-        });
-        addToast('Usuário atualizado com sucesso!', 'success');
+        await updateDoc(userRef, { name, role });
+        addToast(`Usuário "${name}" atualizado com sucesso!`, 'success');
       } else {
-        // Create new user
+        // Create new user in Auth and Firestore
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        await setDoc(doc(db, "users", user.uid), {
+        const newUser = userCredential.user;
+        await setDoc(doc(db, 'users', newUser.uid), {
           name,
           email,
           role,
         });
-        addToast('Usuário criado com sucesso!', 'success');
+        addToast(`Usuário "${name}" criado com sucesso!`, 'success');
       }
       onSuccess();
       onClose();
-    } catch (err: any) {
-      let errorMessage = `Ocorreu um erro ao ${usuarioToEdit ? 'atualizar' : 'criar'} o usuário.`;
-      if (err.code === 'auth/email-already-in-use') errorMessage = 'Este email já está em uso.';
-      if (err.code === 'auth/weak-password') errorMessage = 'A senha deve ter pelo menos 6 caracteres.';
-      addToast(errorMessage, 'error');
-      console.error(err);
+    } catch (error: any) {
+      if (error.code === 'auth/email-already-in-use') {
+        addToast('Este email já está em uso.', 'error');
+      } else {
+        addToast(`Erro: ${error.message}`, 'error');
+      }
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -122,19 +118,15 @@ const Usuarios: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-        const usersCollection = collection(db, 'users');
-        const q = query(usersCollection, orderBy('name'));
-        const usersSnapshot = await getDocs(q);
-        const usersList = usersSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        } as Usuario));
-        setUsuarios(usersList);
-    } catch (fetchError: any) {
-        setError('Não foi possível carregar os usuários: ' + fetchError.message);
-        console.error(fetchError);
+      const q = query(collection(db, 'users'), orderBy('name', 'asc'));
+      const querySnapshot = await getDocs(q);
+      const usuariosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Usuario));
+      setUsuarios(usuariosData);
+    } catch (err) {
+      console.error("Error fetching usuarios:", err);
+      setError("Não foi possível carregar os usuários. Missing or insufficient permissions.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   }, []);
 
@@ -155,13 +147,14 @@ const Usuarios: React.FC = () => {
   const confirmDelete = async () => {
     if (!usuarioToDelete) return;
     try {
-      // Note: This only deletes the Firestore record.
-      // Deleting from Firebase Auth requires a backend function (Cloud Function) for security.
+      // IMPORTANT: This only deletes the Firestore record, not the Firebase Auth user.
+      // Deleting an Auth user requires admin privileges, typically via a Cloud Function.
       await deleteDoc(doc(db, 'users', usuarioToDelete.id));
-      addToast('Usuário excluído com sucesso!', 'success');
-      fetchUsuarios();
-    } catch(error: any) {
-      addToast('Erro ao excluir usuário: ' + error.message, 'error');
+      addToast(`Usuário "${usuarioToDelete.name}" excluído do banco de dados!`, 'success');
+      fetchUsuarios(); // Refresh list
+    } catch (error) {
+      addToast("Erro ao excluir usuário.", 'error');
+      console.error("Error deleting user document:", error);
     } finally {
       setIsConfirmModalOpen(false);
       setUsuarioToDelete(null);

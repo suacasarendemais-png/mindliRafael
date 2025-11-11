@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { db } from '../lib/firebase';
-import { collection, addDoc, getDocs, query, where, orderBy, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { Curso } from '../types';
 import { SearchIcon, ChevronDownIcon, EyeIcon, PencilIcon, TrashIcon } from '../components/Icons';
 import Modal from '../components/Modal';
@@ -30,25 +30,24 @@ const CursoForm: React.FC<{
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
+      const data = { name, description, teacher };
       if (cursoToEdit) {
         const cursoRef = doc(db, 'cursos', cursoToEdit.id);
-        await updateDoc(cursoRef, { name, description, teacher });
-        addToast('Curso atualizado com sucesso!', 'success');
+        await updateDoc(cursoRef, data);
+        addToast(`Curso "${name}" atualizado com sucesso!`, 'success');
       } else {
         await addDoc(collection(db, 'cursos'), {
-          name,
-          description,
-          teacher,
+          ...data,
           created_at: serverTimestamp(),
         });
-        addToast('Curso criado com sucesso!', 'success');
+        addToast(`Curso "${name}" criado com sucesso!`, 'success');
       }
       onSuccess();
       onClose();
     } catch (error: any) {
-      addToast(`Erro ao ${cursoToEdit ? 'atualizar' : 'criar'} o curso: ` + error.message, 'error');
+      addToast(`Erro: ${error.message}`, 'error');
+    } finally {
       setLoading(false);
     }
   };
@@ -123,15 +122,13 @@ const Cursos: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const cursosCollection = collection(db, 'cursos');
-      const q = query(cursosCollection, orderBy('created_at', 'desc'));
-      const cursosSnapshot = await getDocs(q);
-      const cursosList = cursosSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Curso));
-      setCursos(cursosList);
-
-    } catch (fetchError: any) {
-      setError('Não foi possível carregar os cursos: ' + fetchError.message);
-      console.error(fetchError);
+      const q = query(collection(db, 'cursos'), orderBy('created_at', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const cursosData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Curso));
+      setCursos(cursosData);
+    } catch (err) {
+      console.error("Error fetching cursos:", err);
+      setError("Não foi possível carregar os cursos. Missing or insufficient permissions.");
     } finally {
       setLoading(false);
     }
@@ -153,25 +150,13 @@ const Cursos: React.FC = () => {
   
   const confirmDelete = async () => {
     if (!cursoToDelete) return;
-
     try {
-      // Check if any turma is linked to this course
-      const turmasRef = collection(db, 'turmas');
-      const q = query(turmasRef, where("courseId", "==", cursoToDelete.id));
-      const turmasSnap = await getDocs(q);
-      
-      if (!turmasSnap.empty) {
-        addToast(`Não é possível excluir. O curso está vinculado a ${turmasSnap.size} turma(s).`, 'error');
-        setIsConfirmModalOpen(false);
-        setCursoToDelete(null);
-        return;
-      }
-
       await deleteDoc(doc(db, 'cursos', cursoToDelete.id));
-      addToast('Curso excluído com sucesso!', 'success');
-      fetchCursos();
-    } catch (error: any) {
-      addToast('Erro ao excluir curso: ' + error.message, 'error');
+      addToast(`Curso "${cursoToDelete.name}" excluído com sucesso!`, 'success');
+      fetchCursos(); // Refresh list
+    } catch (error) {
+      addToast("Erro ao excluir curso.", 'error');
+      console.error("Error deleting curso:", error);
     } finally {
       setIsConfirmModalOpen(false);
       setCursoToDelete(null);

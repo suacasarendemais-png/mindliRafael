@@ -32,11 +32,11 @@ const AvaliacoesGerenciar: React.FC = () => {
         try {
             const q = query(collection(db, 'avaliacoes'), orderBy('created_at', 'desc'));
             const querySnapshot = await getDocs(q);
-            const list = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Avaliacao));
-            setAvaliacoes(list);
-        } catch (err: any) {
+            const avaliacoesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Avaliacao));
+            setAvaliacoes(avaliacoesData);
+        } catch (err) {
+            console.error("Error fetching avaliacoes:", err);
             setError("Não foi possível carregar as avaliações.");
-            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -56,9 +56,10 @@ const AvaliacoesGerenciar: React.FC = () => {
         try {
             await deleteDoc(doc(db, 'avaliacoes', avaliacaoToDelete.id));
             addToast('Avaliação excluída com sucesso!', 'success');
-            fetchAvaliacoes();
-        } catch (error: any) {
-            addToast('Erro ao excluir avaliação: ' + error.message, 'error');
+            fetchAvaliacoes(); // Refresh
+        } catch (error) {
+            addToast("Erro ao excluir avaliação.", 'error');
+            console.error("Error deleting avaliacao:", error);
         } finally {
             setConfirmOpen(false);
             setAvaliacaoToDelete(null);

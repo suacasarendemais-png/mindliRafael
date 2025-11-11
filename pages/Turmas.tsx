@@ -31,30 +31,25 @@ const TurmaForm: React.FC<{
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
+      const data = { name, serie, turno };
       if (turmaToEdit) {
-        // Update existing turma
         const turmaRef = doc(db, 'turmas', turmaToEdit.id);
-        await updateDoc(turmaRef, { name, serie, turno });
-        addToast('Turma atualizada com sucesso!', 'success');
+        await updateDoc(turmaRef, data);
+        addToast(`Turma "${name}" atualizada com sucesso!`, 'success');
       } else {
-        // Create new turma
         await addDoc(collection(db, 'turmas'), {
-          name,
-          serie,
-          turno,
+          ...data,
           created_at: serverTimestamp(),
-          studentIds: [],
         });
-        addToast('Turma criada com sucesso!', 'success');
+        addToast(`Turma "${name}" criada com sucesso!`, 'success');
       }
       onSuccess();
       onClose();
     } catch (error: any) {
-      addToast(`Erro ao ${turmaToEdit ? 'atualizar' : 'criar'} a turma: ` + error.message, 'error');
+      addToast(`Erro: ${error.message}`, 'error');
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -141,20 +136,20 @@ const Turmas: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const turmasCollection = collection(db, 'turmas');
-      const q = query(turmasCollection, orderBy('created_at', 'desc'));
-      const turmasSnapshot = await getDocs(q);
-      const turmasList = turmasSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Turma));
-
-      const turmasComAlunos = turmasList.map(t => ({ 
-        ...t, 
-        students: t.studentIds ? t.studentIds.length : 0 
-      }));
-      setTurmas(turmasComAlunos);
-
-    } catch (fetchError: any) {
-      setError('Não foi possível carregar as turmas: ' + fetchError.message);
-      console.error(fetchError);
+      const q = query(collection(db, 'turmas'), orderBy('created_at', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const turmasData = querySnapshot.docs.map(doc => {
+        const data = doc.data() as Turma;
+        return {
+          id: doc.id,
+          ...data,
+          students: data.studentIds?.length || 0
+        }
+      });
+      setTurmas(turmasData);
+    } catch (err) {
+      console.error("Error fetching turmas:", err);
+      setError("Não foi possível carregar as turmas. Missing or insufficient permissions.");
     } finally {
       setLoading(false);
     }
@@ -178,10 +173,11 @@ const Turmas: React.FC = () => {
     if (!turmaToDelete) return;
     try {
       await deleteDoc(doc(db, 'turmas', turmaToDelete.id));
-      addToast('Turma excluída com sucesso!', 'success');
-      fetchTurmas();
-    } catch (error: any) {
-      addToast('Erro ao excluir turma: ' + error.message, 'error');
+      addToast(`Turma "${turmaToDelete.name}" excluída com sucesso!`, 'success');
+      fetchTurmas(); // Refresh list
+    } catch (error) {
+      addToast("Erro ao excluir turma.", 'error');
+      console.error("Error deleting turma:", error);
     } finally {
       setIsConfirmModalOpen(false);
       setTurmaToDelete(null);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../../lib/firebase';
-import { collection, getCountFromServer, query, where } from 'firebase/firestore';
 import { UsersIcon, BookOpenIcon } from '../../components/Icons';
+import { db } from '../../lib/firebase';
+import { collection, query, where, getCountFromServer } from 'firebase/firestore';
 
 const DashboardAdmin: React.FC = () => {
   const [stats, setStats] = useState({
@@ -11,46 +11,41 @@ const DashboardAdmin: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  
   useEffect(() => {
     const fetchStats = async () => {
       setLoading(true);
       setError(null);
       try {
-        // Get total users
-        const usersCollection = collection(db, 'users');
-        const usersSnapshot = await getCountFromServer(usersCollection);
-        
-        // Get total classes
-        const turmasCollection = collection(db, 'turmas');
-        const turmasSnapshot = await getCountFromServer(turmasCollection);
+        const usersCol = collection(db, 'users');
+        const turmasCol = collection(db, 'turmas');
 
-        // Get active students
-        const alunosQuery = query(usersCollection, where('role', '==', 'Aluno'));
-        const alunosSnapshot = await getCountFromServer(alunosQuery);
+        const totalUsuariosQuery = query(usersCol);
+        const totalTurmasQuery = query(turmasCol);
+        const alunosAtivosQuery = query(usersCol, where('role', '==', 'Aluno'));
+
+        const [totalUsuariosSnap, totalTurmasSnap, alunosAtivosSnap] = await Promise.all([
+          getCountFromServer(totalUsuariosQuery),
+          getCountFromServer(totalTurmasQuery),
+          getCountFromServer(alunosAtivosQuery),
+        ]);
 
         setStats({
-          totalUsuarios: usersSnapshot.data().count.toString(),
-          totalTurmas: turmasSnapshot.data().count.toString(),
-          alunosAtivos: alunosSnapshot.data().count.toString(),
+          totalUsuarios: totalUsuariosSnap.data().count.toString(),
+          totalTurmas: totalTurmasSnap.data().count.toString(),
+          alunosAtivos: alunosAtivosSnap.data().count.toString(),
         });
 
       } catch (err) {
         console.error("Error fetching dashboard stats:", err);
         setError("Não foi possível carregar as estatísticas.");
-        setStats({
-          totalUsuarios: '!',
-          totalTurmas: '!',
-          alunosAtivos: '!',
-        });
       } finally {
         setLoading(false);
       }
     };
-
     fetchStats();
   }, []);
-  
+
   const statCards = [
     { name: 'Total de Usuários', stat: stats.totalUsuarios, icon: UsersIcon },
     { name: 'Total de Turmas', stat: stats.totalTurmas, icon: BookOpenIcon },
