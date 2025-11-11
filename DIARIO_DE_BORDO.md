@@ -4,6 +4,24 @@ Este documento registra o histórico de desenvolvimento da plataforma MINDLI, de
 
 ---
 
+### **Etapa 23: Correção de Erro de Build e Gerenciamento de Dependências**
+
+**Objetivo:** Resolver um erro crítico de compilação (`TS2307: Cannot find module '@google/genai'`) que impedia o deploy da aplicação em produção.
+
+**Diagnóstico do Problema:**
+- O pacote `@google/genai` era referenciado em um `importmap` no `index.html`, o que permitia seu funcionamento em ambiente de desenvolvimento (`npm run dev`).
+- No entanto, o pacote **não estava listado como uma dependência** no arquivo `package.json`.
+- Durante o processo de build (`npm run build`), o TypeScript tentava encontrar as definições de tipo para o `@google/genai`, mas não conseguia, pois o pacote não havia sido instalado no `node_modules`. Isso causava a falha na compilação.
+
+**Implementações:**
+- **Adição da Dependência ao `package.json`:** O pacote `@google/genai` foi adicionado à seção `dependencies` do `package.json`. Isso garante que o `npm install` baixe o pacote e suas tipagens, tornando-o acessível para o TypeScript e o Vite durante o build.
+- **Remoção do `importmap`:** A entrada correspondente ao `@google/genai` foi removida do `importmap` no `index.html` para evitar conflitos e tornar o `package.json` a única fonte de verdade para as dependências do projeto, que é a prática recomendada com bundlers como o Vite.
+- **Atualização do Diário de Bordo:** Documentada a correção técnica, ressaltando a importância de manter a consistência entre as dependências de desenvolvimento e de build.
+
+**Resultado:** O erro de compilação foi resolvido. A aplicação agora pode ser compilada com sucesso para produção, garantindo que os deploys possam ser concluídos sem falhas relacionadas a dependências ausentes.
+
+---
+
 ### **Etapa 22: Correção Crítica de Autenticação e Permissões do Banco de Dados**
 
 **Objetivo:** Resolver a causa raiz dos erros de "Permissão Negada" (`permission-denied`) do Firestore, que impediam a aplicação de ler qualquer dado do banco de dados.
