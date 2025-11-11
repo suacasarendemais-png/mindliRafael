@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { SearchIcon, ChevronDownIcon, PencilIcon, TrashIcon } from '../components/Icons';
+import { SearchIcon, ChevronDownIcon, PencilIcon, TrashIcon, InformationCircleIcon } from '../components/Icons';
 import Modal from '../components/Modal';
-import ConfirmationModal from '../components/ConfirmationModal';
 import { db, auth } from '../lib/firebase';
 import { collection, getDocs, setDoc, doc, query, orderBy, updateDoc, deleteDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { Usuario } from '../types';
 import { useToast } from '../components/Toaster';
+import { GoogleGenAI } from '@google/genai';
 
 const UsuarioForm: React.FC<{ 
   onClose: () => void; 
@@ -100,6 +100,78 @@ const UsuarioForm: React.FC<{
     </form>
   );
 };
+
+const DeleteUserModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  userToDelete: Usuario | null;
+}> = ({ isOpen, onClose, onConfirm, userToDelete }) => {
+    const [confirmationName, setConfirmationName] = useState('');
+    const [aiResponse, setAiResponse] = useState('');
+    const [loadingAi, setLoadingAi] = useState(false);
+
+    const isConfirmed = confirmationName === userToDelete?.name;
+
+    useEffect(() => {
+        if (isOpen && userToDelete) {
+            setLoadingAi(true);
+            const fetchAiGreeting = async () => {
+                const ai = new GoogleGenAI({apiKey: (import.meta as any).env.VITE_GEMINI_API_KEY});
+                const prompt = `Você é um assistente de confirmação em um sistema educacional. A exclusão de um usuário é uma ação permanente e perigosa. Sua tarefa é alertar o administrador sobre isso de forma clara e concisa, e instruí-lo a digitar o nome completo do usuário para confirmar. O nome do usuário a ser excluído é "${userToDelete.name}". Inicie a conversa de forma direta.`;
+                const responseStream = await ai.models.generateContentStream({
+                    model: 'gemini-2.5-flash',
+                    contents: prompt,
+                });
+                
+                let text = '';
+                for await (const chunk of responseStream) {
+                    text += chunk.text;
+                    setAiResponse(text);
+                }
+                setLoadingAi(false);
+            };
+            fetchAiGreeting();
+        } else {
+            setConfirmationName('');
+            setAiResponse('');
+        }
+    }, [isOpen, userToDelete]);
+
+    if (!userToDelete) return null;
+
+    return (
+        <Modal isOpen={isOpen} onClose={onClose} title="Confirmar Exclusão de Usuário">
+            <div className="space-y-4">
+                <div className="flex items-start gap-3 bg-gray-900/50 p-4 rounded-lg">
+                    <InformationCircleIcon className="w-6 h-6 text-yellow-400 flex-shrink-0 mt-1"/>
+                    <p className="text-gray-300">
+                        {aiResponse}
+                        {loadingAi && <span className="inline-block w-2 h-4 bg-white animate-pulse ml-1" />}
+                    </p>
+                </div>
+                <div>
+                    <label htmlFor="confirmation-name" className="block text-sm font-medium text-gray-300 mb-2">
+                        Digite <span className="font-bold text-white">{userToDelete.name}</span> para confirmar
+                    </label>
+                    <input
+                        id="confirmation-name"
+                        type="text"
+                        value={confirmationName}
+                        onChange={(e) => setConfirmationName(e.target.value)}
+                        className="w-full bg-gray-700/60 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                </div>
+                <div className="flex justify-end gap-4 pt-4">
+                    <button onClick={onClose} className="px-5 py-2.5 bg-gray-600 hover:bg-gray-700 text-white font-semibold rounded-lg transition-colors">Cancelar</button>
+                    <button onClick={onConfirm} disabled={!isConfirmed} className="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        Deletar Permanentemente
+                    </button>
+                </div>
+            </div>
+        </Modal>
+    )
+}
 
 
 const Usuarios: React.FC = () => {
@@ -314,12 +386,11 @@ const Usuarios: React.FC = () => {
         />
       </Modal>
 
-      <ConfirmationModal
+      <DeleteUserModal
         isOpen={isConfirmModalOpen}
         onClose={() => setIsConfirmModalOpen(false)}
         onConfirm={confirmDelete}
-        title="Confirmar Exclusão"
-        message={`Tem certeza de que deseja excluir o usuário "${usuarioToDelete?.name}"? Esta ação não pode ser desfeita.`}
+        userToDelete={usuarioToDelete}
       />
     </>
   );

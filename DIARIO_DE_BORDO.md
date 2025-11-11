@@ -4,6 +4,26 @@ Este documento registra o histórico de desenvolvimento da plataforma MINDLI, de
 
 ---
 
+### **Etapa 22: Correção Crítica de Autenticação e Permissões do Banco de Dados**
+
+**Objetivo:** Resolver a causa raiz dos erros de "Permissão Negada" (`permission-denied`) do Firestore, que impediam a aplicação de ler qualquer dado do banco de dados.
+
+**Diagnóstico do Problema:**
+- A aplicação estava utilizando um sistema de **usuário "mock" (simulado)** que existia apenas localmente no navegador (`AuthContext.tsx`).
+- Este usuário simulado **não estava autenticado de verdade** com o serviço do Firebase Authentication.
+- Como resultado, todas as requisições ao Firestore eram feitas por um usuário anônimo (`request.auth` era `null`).
+- As **Regras de Segurança do Firestore** estavam corretamente configuradas para exigir um usuário autenticado, bloqueando todas as requisições e causando os erros.
+
+**Implementações:**
+- **Reativação do `onAuthStateChanged`:** O `AuthContext.tsx` foi completamente refatorado para remover o usuário simulado. A lógica de `onAuthStateChanged` foi reintroduzida para monitorar o estado de autenticação real do Firebase.
+- **Busca de Perfil de Usuário:** Ao detectar um usuário logado, o contexto agora busca ativamente o perfil correspondente na coleção `users` do Firestore, recuperando informações essenciais como o `role` (Admin, Aluno, etc.).
+- **Integração da Tela de Login:** O componente `App.tsx` foi modificado para exibir a tela de `Login.tsx` se nenhum usuário estiver autenticado. Somente após um login bem-sucedido, o layout principal da plataforma e suas rotas protegidas são renderizados.
+- **Atualização do Diário de Bordo:** Documentada a correção e o novo fluxo de autenticação como um passo crítico na estabilização da aplicação.
+
+**Resultado:** O problema fundamental de permissões foi resolvido. A aplicação agora opera com um fluxo de autenticação real e seguro, onde as permissões são validadas corretamente pelas regras do Firestore, permitindo que os dados sejam carregados e a plataforma funcione como esperado.
+
+---
+
 ### **Etapa 21: Estabilização do Ambiente de Produção e Conexão Real com Backend**
 
 **Objetivo:** Garantir a integridade do código para o build em produção, resolver inconsistências de dados causadas por regras de segurança e reativar a conexão completa com o backend do Firebase para operar com dados reais.

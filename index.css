@@ -22,4 +22,8 @@
   .animate-toast-in {
       animation: toast-in 0.3s ease-out forwards;
   }
+  .bg-dots-pattern {
+      background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.08) 1px, transparent 0);
+      background-size: 20px 20px;
+  }
 }

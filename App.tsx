@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ToastProvider } from './components/Toaster';
 
 import Layout from './components/Layout';
+import Login from './pages/Login';
 import DashboardAdmin from './pages/dashboards/DashboardAdmin';
 import DashboardAluno from './pages/dashboards/DashboardAluno';
 import Turmas from './pages/Turmas';
@@ -27,7 +28,7 @@ import RevisaoAvaliacao from './pages/RevisaoAvaliacao';
 
 
 const AppRoutes: React.FC = () => {
-  const { userProfile, loading } = useAuth();
+  const { user, userProfile, loading } = useAuth();
 
   if (loading) {
     return (
@@ -35,6 +36,26 @@ const AppRoutes: React.FC = () => {
         <div className="text-white">Carregando...</div>
       </div>
     );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-900 bg-dots-pattern">
+        <Login />
+      </div>
+    );
+  }
+
+  if (!userProfile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-900">
+        <div className="text-center text-white p-4">
+            <h2 className="text-2xl font-bold">Erro de Perfil</h2>
+            <p className="text-gray-400 mt-2">Não foi possível encontrar seu perfil de usuário no banco de dados.</p>
+            <p className="text-gray-500 mt-1">Por favor, contate o administrador da plataforma.</p>
+        </div>
+      </div>
+    )
   }
   
   const getDashboardByRole = () => {
