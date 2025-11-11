@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -30,13 +30,7 @@ import RevisaoAvaliacao from './pages/RevisaoAvaliacao';
 const AppRoutes: React.FC = () => {
   const { user, userProfile, loading } = useAuth();
 
-  // LOGS DE DIAGNÓSTICO TEMPORÁRIOS
-  useEffect(() => {
-    if (!loading) {
-      console.log("Diagnóstico - userProfile:", userProfile);
-      console.log("Diagnóstico - Role:", userProfile?.role);
-    }
-  }, [loading, userProfile]);
+
 
   if (loading) {
     return (
