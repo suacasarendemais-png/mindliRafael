@@ -1,4 +1,4 @@
-    # MINDLI - Plataforma Educacional Digital
+# MINDLI - Plataforma Educacional Digital
 
 ## Resumo
 - SPA em React + TypeScript + Vite
@@ -58,5 +58,3 @@
 - [ ] Rodar `npm run build` e corrigir erros de build se existirem.
 - [ ] Subir para a plataforma de deploy e configurar as variáveis de ambiente.
 - [ ] Revisar as regras de segurança do Firestore para produção.
-
-    
