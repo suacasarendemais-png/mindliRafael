@@ -8,7 +8,7 @@ export interface Turma {
   courseId?: string;
 }
 
-export type TurmaComContagemDeAlunos = Turma & { students: number };
+export type TurmaComContagemDeAlunos = Turma & { students: number; courseName?: string; };
 
 export interface Usuario {
   id: string; // Corresponds to Firebase Auth UID
@@ -109,4 +109,18 @@ export interface RevisaoDetalhada {
   avaliacao: Avaliacao;
   exercicios: Exercicio[];
   aluno: Usuario;
+}
+
+// NOVO TIPO PARA BIBLIOTECA
+export interface MaterialBiblioteca {
+  id: string;
+  name: string;
+  type: string; // PDF, DOC, Vídeo, etc.
+  discipline: string;
+  size: number; // in bytes
+  uploaderName: string;
+  uploaderId: string;
+  downloadURL: string;
+  storagePath: string;
+  created_at: any;
 }

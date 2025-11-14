@@ -39,6 +39,10 @@ const UsuarioForm: React.FC<{
         addToast(`Usuário "${name}" atualizado com sucesso!`, 'success');
       } else {
         // Create new user in Auth and Firestore
+        // ATENÇÃO: A criação de usuários pelo cliente deve ser usada com cuidado.
+        // O ideal é que seja feita por uma Cloud Function para mais segurança,
+        // mas para o painel de admin, isso é aceitável se as regras do Firestore
+        // estiverem bem configuradas.
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const newUser = userCredential.user;
         await setDoc(doc(db, 'users', newUser.uid), {
@@ -53,6 +57,8 @@ const UsuarioForm: React.FC<{
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
         addToast('Este email já está em uso.', 'error');
+      } else if (error.code === 'auth/weak-password') {
+        addToast('A senha deve ter pelo menos 6 caracteres.', 'error');
       } else {
         addToast(`Erro: ${error.message}`, 'error');
       }
@@ -219,8 +225,8 @@ const Usuarios: React.FC = () => {
   const confirmDelete = async () => {
     if (!usuarioToDelete) return;
     try {
-      // IMPORTANT: This only deletes the Firestore record, not the Firebase Auth user.
-      // Deleting an Auth user requires admin privileges, typically via a Cloud Function.
+      // Deleta apenas o documento do Firestore. 
+      // A exclusão do Firebase Auth deve ser feita via Cloud Function.
       await deleteDoc(doc(db, 'users', usuarioToDelete.id));
       addToast(`Usuário "${usuarioToDelete.name}" excluído do banco de dados!`, 'success');
       fetchUsuarios(); // Refresh list

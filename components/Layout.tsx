@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { auth } from '../lib/firebase';
 import { signOut } from 'firebase/auth';
-import { HomeIcon, UsersIcon, BookOpenIcon, LogOutIcon, RectangleStackIcon, CogIcon, ArchiveBoxIcon, ChatBubbleLeftRightIcon, TrophyIcon, ClipboardDocumentListIcon, DocumentTextIcon } from './Icons';
+import { HomeIcon, UsersIcon, BookOpenIcon, LogOutIcon, RectangleStackIcon, CogIcon, ArchiveBoxIcon, ChatBubbleLeftRightIcon, TrophyIcon, ClipboardDocumentListIcon, DocumentTextIcon, DocumentArrowUpIcon } from './Icons';
 import { useAuth } from '../contexts/AuthContext';
 
 
@@ -33,6 +33,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     { to: "/usuarios", text: "Usuários", icon: UsersIcon, roles: ['Admin'] },
     { to: "/exercicios/gerenciar", text: "Exercícios", icon: DocumentTextIcon, roles: ['Admin', 'Professor'] },
     { to: "/avaliacoes/gerenciar", text: "Avaliações", icon: ClipboardDocumentListIcon, roles: ['Admin', 'Professor'] },
+    { to: "/importacao", text: "Importação em Lote", icon: DocumentArrowUpIcon, roles: ['Admin'] },
     
     // Comuns
     { to: "/gamificacao", text: "Gamificação", icon: TrophyIcon, roles: ['Admin', 'Aluno', 'Professor'] },

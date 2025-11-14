@@ -13,6 +13,7 @@ import TurmaDetalhes from './pages/TurmaDetalhes';
 import Cursos from './pages/Cursos';
 import CursoDetalhes from './pages/CursoDetalhes';
 import Usuarios from './pages/Usuarios';
+import Importacao from './pages/Importacao'; // Nova Importação
 import Gamificacao from './pages/Gamificacao';
 import Mensagens from './pages/Mensagens';
 import Biblioteca from './pages/Biblioteca';
@@ -81,6 +82,7 @@ const AppRoutes: React.FC = () => {
           <Route path="/cursos" element={<Cursos />} />
           <Route path="/cursos/:id" element={<CursoDetalhes />} />
           <Route path="/usuarios" element={<Usuarios />} />
+          <Route path="/importacao" element={<Importacao />} />
           <Route path="/gamificacao" element={<Gamificacao />} />
           <Route path="/mensagens" element={<Mensagens />} />
           <Route path="/biblioteca" element={<Biblioteca />} />

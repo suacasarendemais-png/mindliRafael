@@ -4,6 +4,54 @@ Este documento registra o histórico de desenvolvimento da plataforma MINDLI, de
 
 ---
 
+### **Etapa 26: Funcionalidade Completa da Biblioteca com Upload de Arquivos**
+
+**Objetivo:** Transformar a página da Biblioteca de um protótipo visual para um sistema de gerenciamento de arquivos totalmente funcional, permitindo que administradores e professores façam upload e compartilhem materiais de estudo.
+
+**Implementações:**
+- **Integração com Firebase Storage:** Configurado o Firebase Storage como backend para o armazenamento físico dos arquivos (`lib/firebase.ts`).
+- **Lógica de Upload:**
+    - Criado um modal (`UploadModal`) para o processo de upload, permitindo a seleção de arquivos e a definição da disciplina associada.
+    - Implementada a função de upload que envia o arquivo para o Firebase Storage e exibe uma barra de progresso em tempo real.
+- **Persistência de Metadados no Firestore:** Após o upload bem-sucedido, as informações do arquivo (nome, URL para download, tamanho, disciplina, etc.) são salvas em uma nova coleção `biblioteca` no Firestore.
+- **Listagem Dinâmica:** A página `Biblioteca.tsx` foi refatorada para buscar e exibir a lista de materiais diretamente do Firestore, abandonando os dados de demonstração.
+- **Funcionalidade de Download e Visualização:** Os botões nos cards de materiais agora utilizam a `downloadURL` salva no Firestore para permitir que os usuários visualizem os arquivos em uma nova aba ou façam o download direto.
+- **Atualização de Tipos:** Criada a interface `MaterialBiblioteca` em `types.ts` para garantir a consistência dos dados.
+- **Atualização do Diário de Bordo:** Documentada a nova funcionalidade como um marco importante para a plataforma.
+
+**Resultado:** A Biblioteca agora é uma ferramenta robusta e essencial para a plataforma. Educadores podem centralizar e compartilhar recursos pedagógicos de forma segura e organizada, enriquecendo o ambiente de aprendizado dos alunos.
+
+---
+
+### **Etapa 25: Módulo de Importação em Lote**
+
+**Objetivo:** Agilizar drasticamente o processo de onboarding de novas escolas, permitindo o cadastro em massa de cursos, turmas, professores e alunos através do upload de uma única planilha.
+
+**Implementações:**
+- **Criação da Página `Importacao.tsx`:** Desenvolvida uma nova página dedicada, com um fluxo de usuário guiado em etapas para minimizar erros.
+- **Modelo de Planilha (`.xlsx`):** Definida uma estrutura de planilha com múltiplas abas (`Cursos`, `Professores`, `Turmas`, `Alunos`) para organizar os dados de forma lógica e clara. A página oferece um botão para o download deste modelo.
+- **Funcionalidade de Upload:** Implementada uma área de upload que aceita arquivos via seleção ou "arrastar e soltar" (drag-and-drop).
+- **Sistema de Validação e Pré-visualização:** Adicionada a biblioteca `xlsx` para ler e processar os dados do arquivo. A interface agora exibe um resumo dos dados encontrados e valida a planilha em busca de erros, bloqueando a importação caso problemas sejam detectados.
+- **Integração de Rota e Navegação:** A nova página foi adicionada ao roteador (`App.tsx`) e um link "Importação em Lote" foi incluído no menu de administradores (`Layout.tsx`), utilizando um novo ícone (`DocumentArrowUpIcon`).
+
+**Resultado:** A plataforma agora possui uma ferramenta poderosa para administradores, reduzindo o trabalho manual de semanas para minutos. O sistema de validação prévia garante a integridade dos dados, tornando o processo de expansão para novas escolas muito mais eficiente e seguro.
+
+---
+
+### **Etapa 24: Melhoria de UX - Visibilidade do Curso Vinculado**
+
+**Objetivo:** Aumentar a eficiência do administrador, exibindo informações cruciais diretamente na página de gerenciamento de turmas, reduzindo a necessidade de cliques.
+
+**Implementações:**
+- **Atualização da Lógica de Dados (`pages/Turmas.tsx`):** A função `fetchTurmas` foi otimizada para buscar, além das turmas, todos os cursos disponíveis. Foi criado um mapa de `id` para `nome` do curso, permitindo uma associação eficiente em memória.
+- **Enriquecimento da Interface (`pages/Turmas.tsx`):** O card de cada turma foi modificado para incluir uma nova seção. Agora, ele exibe o nome do curso vinculado àquela turma, precedido por um ícone de livro.
+- **Feedback Visual Claro:** Caso uma turma ainda não tenha um curso associado, a interface exibe a mensagem "Nenhum curso vinculado", servindo como um lembrete visual para a ação pendente.
+- **Atualização de Tipagem (`types.ts`):** O tipo `TurmaComContagemDeAlunos` foi estendido para incluir a propriedade opcional `courseName`, garantindo a segurança de tipos em todo o componente.
+
+**Resultado:** A página de gerenciamento de turmas se tornou significativamente mais informativa. O administrador agora pode ver, de relance, quais turmas já têm conteúdo curricular associado, otimizando o planejamento e a gestão da plataforma.
+
+---
+
 ### **Etapa 23: Correção de Erro de Build e Gerenciamento de Dependências**
 
 **Objetivo:** Resolver um erro crítico de compilação (`TS2307: Cannot find module '@google/genai'`) que impedia o deploy da aplicação em produção.
